@@ -75,4 +75,5 @@ Users who RSVP to an event can generate a unique **Share Link**.
 Example:
 
 ```text
-https://your-app.com/invite/abc123
+https://your-app.com/invite/
+
