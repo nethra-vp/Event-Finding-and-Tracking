@@ -53,3 +53,10 @@
 	.event-title-row h3 { font-size: 17px; }
 	.event-footer { align-items: center; }
 }
+.chat-event-results { display: grid; gap: 7px; margin-top: 12px; }
+.chat-event-result { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 11px; border: 1px solid #e2e7de; border-radius: 7px; background: #f7faf5; color: #526850; text-decoration: none; }
+.chat-event-result span { min-width: 0; }
+.chat-event-result strong, .chat-event-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-event-result strong { font: 600 12px 'Fraunces', serif; }
+.chat-event-result small { margin-top: 3px; color: #8c9888; font: 9px 'DM Mono', monospace; }
+.chat-event-result > svg { flex: 0 0 auto; color: #789474; }

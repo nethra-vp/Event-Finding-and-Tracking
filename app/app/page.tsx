@@ -38,6 +38,7 @@ type Message = {
   role: 'assistant' | 'user'
   text: string
   eventIds?: string[]
+  events?: SearchEvent[]
 }
 
 type SearchEvent = {
@@ -48,6 +49,7 @@ type SearchEvent = {
   venue: string | null
   city: string | null
   image: string | null
+  url: string | null
 }
 
 const initialEvents: Event[] = [
@@ -65,7 +67,7 @@ const initialEvents: Event[] = [
 const initialMessages: Message[] = [
   { id: 1, role: 'assistant', text: 'Good morning, Maya. What are we making room for this week?' },
   { id: 2, role: 'user', text: 'Find me something fun this weekend. Maybe live music or a good market?' },
-  { id: 3, role: 'assistant', text: 'I found a few that feel like your kind of Saturday. The rooftop jazz set has 3 people in your circle already, and the night market is shaping up nicely.', eventIds: ['jazz-under-stars', 'night-market'] },
+  { id: 3, role: 'assistant', text: 'Ask me about live music, markets, food, or anything happening nearby.' },
 ]
 
 const days = [
@@ -140,13 +142,13 @@ export default function Home() {
       const response = await fetch('/api/v1/chat', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, city: location.split(',')[0] }),
       })
       if (!response.ok) throw new Error('Chat request failed')
-      const result = await response.json() as { data?: { message?: string; eventIds?: string[] } }
+      const result = await response.json() as { data?: { message?: string; eventIds?: string[]; events?: SearchEvent[] } }
       const assistantMessage = result.data?.message
       if (assistantMessage) {
-        setMessages((current) => [...current.slice(0, -1), { id: Date.now(), role: 'assistant', text: assistantMessage, eventIds: result.data?.eventIds }])
+        setMessages((current) => [...current.slice(0, -1), { id: Date.now(), role: 'assistant', text: assistantMessage, eventIds: result.data?.eventIds, events: result.data?.events }])
       }
     } catch {
       // The optimistic assistant reply keeps the composer useful during local API setup.
@@ -170,7 +172,7 @@ export default function Home() {
             <div className="section-heading"><div><span className="section-kicker"><span className="live-dot" /> YOUR EVENT SIDEKICK</span><h1>Make a plan<br /><em>worth showing up for.</em></h1></div><button className="icon-button" aria-label="More chat options"><MoreHorizontal size={20} /></button></div>
             <div className="chat-panel">
               <div className="chat-status"><span className="assistant-orb"><Sparkles size={16} /></span><div><strong>eventide assistant</strong><span>always looking around</span></div><span className="online-status"><span /> live</span></div>
-              <div className="message-list" aria-live="polite">{messages.map((message) => <div key={message.id} className={message.role === 'user' ? 'message-row user-message' : 'message-row'}>{message.role === 'assistant' && <span className="message-avatar"><Sparkles size={13} /></span>}<div className="message-content"><p>{message.text}</p>{message.eventIds && <div className="message-event-links"><span><Flame size={13} /> 2 strong matches</span><button onClick={() => setActiveNav('Discover')}>View all <ArrowUp size={13} /></button></div>}</div></div>)}</div>
+              <div className="message-list" aria-live="polite">{messages.map((message) => <div key={message.id} className={message.role === 'user' ? 'message-row user-message' : 'message-row'}>{message.role === 'assistant' && <span className="message-avatar"><Sparkles size={13} /></span>}<div className="message-content"><p>{message.text}</p>{message.events?.length ? <div className="chat-event-results">{message.events.map((event) => <a key={event.id} className="chat-event-result" href={event.url ?? `/api/v1/events/${event.id}`} target="_blank" rel="noreferrer"><span><strong>{event.title}</strong><small>{event.date ?? 'Date TBA'} · {event.venue ?? event.city ?? 'Venue TBA'}</small></span><ExternalLink size={13} /></a>)}</div> : message.eventIds && <div className="message-event-links"><span><Flame size={13} /> live matches</span><button onClick={() => setActiveNav('Discover')}>View all <ArrowUp size={13} /></button></div>}</div></div>)}</div>
               <form className="composer" onSubmit={sendMessage}><input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={isSending ? 'Looking around...' : 'Ask me to find something...'} aria-label="Ask eventide" disabled={isSending} /><button className="send-button" type="submit" aria-label="Send message" disabled={isSending}><Send size={16} /></button></form>
               <div className="prompt-chips"><button onClick={() => setDraft('What is happening this Friday?')}>What’s happening Friday?</button><button onClick={() => setDraft('Find a low-key dinner plan')}>Low-key dinner plans</button></div>
             </div>

@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server'
-
-const eventMatches = [
-  { id: 'jazz-under-stars', title: 'Jazz Under the Stars' },
-  { id: 'night-market', title: 'Sunset Night Market' },
-]
+import { searchTicketmaster, type NormalizedEvent } from '@/lib/ticketmaster'
 
 type ChatRequest = {
   message?: unknown
+  city?: unknown
 }
 
 export async function POST(request: Request) {
@@ -23,18 +20,29 @@ export async function POST(request: Request) {
   }
 
   const message = body.message.trim()
+  const city = typeof body.city === 'string' ? body.city.trim().slice(0, 80) : undefined
   const wantsPlans = /plan|rsvp|interested|going/i.test(message)
-  const response = wantsPlans
-    ? 'I can help shape that plan. I found a couple of nearby options, and I’ll keep the RSVP step explicit so nothing gets added without your say-so.'
-    : 'I found a couple of nearby options that fit the mood. I’ll keep the search tuned to your location and this weekend.'
+  const keyword = message.replace(/\b(find|show me|search for|look for|events?|near me)\b/gi, '').trim() || message
+  let events: NormalizedEvent[] = []
+  try {
+    events = await searchTicketmaster({ keyword, city, size: 5 })
+  } catch {
+    events = []
+  }
+  const response = events.length
+    ? wantsPlans
+      ? `I found ${events.length} live options nearby. I’ll keep the RSVP step explicit so nothing gets added without your say-so.`
+      : `I found ${events.length} live options that fit the mood. Open any result below to see the full event details.`
+    : 'I couldn’t find live matches for that request yet. Try adding a city, date, artist, venue, or event type.'
 
   return NextResponse.json({
     data: {
       message: response,
-      eventIds: eventMatches.map((event) => event.id),
+      events,
+      eventIds: events.map((event) => event.id),
       intent: wantsPlans ? 'plan_management' : 'event_search',
       query: message,
     },
-    meta: { source: 'demo-provider', matches: eventMatches.length },
+    meta: { source: process.env.TICKETMASTER_API_KEY ? 'ticketmaster' : 'unconfigured', matches: events.length },
   })
 }
