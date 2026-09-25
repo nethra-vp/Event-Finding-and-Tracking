@@ -60,3 +60,26 @@
 .chat-event-result strong { font: 600 12px 'Fraunces', serif; }
 .chat-event-result small { margin-top: 3px; color: #8c9888; font: 9px 'DM Mono', monospace; }
 .chat-event-result > svg { flex: 0 0 auto; color: #789474; }
+.calendar-controls { display: flex; gap: 4px; margin-left: auto; }
+.calendar-controls button { width: 22px; height: 22px; border: 1px solid #eadbc9; border-radius: 4px; background: rgba(255,255,255,.35); color: #a78970; line-height: 1; }
+.calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.calendar-weekdays { margin-top: 14px; color: #b39d86; font: 8px 'DM Mono', monospace; text-align: center; }
+.calendar-grid { margin-top: 6px; }
+.calendar-day { position: relative; min-height: 35px; border: 0; border-radius: 5px; background: transparent; color: #806c5b; }
+.calendar-day.muted { color: #c9bbaa; }
+.calendar-day.has-event { background: #f0d5b7; color: #80593f; font-weight: 700; }
+.calendar-day i { position: absolute; left: calc(50% - 2px); bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: #d88461; }
+.event-actions { display: flex; align-items: center; gap: 4px; }
+.plans-dashboard { max-width: 900px; width: 100%; margin: 0 auto; padding: 64px 6% 50px; }
+.plan-count { margin-top: 8px; color: #789474; font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+.plans-list { display: grid; gap: 12px; }
+.plan-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; border: 1px solid #e2e4db; border-radius: 9px; background: #fffefa; }
+.plan-row > div { min-width: 0; }
+.plan-row span { color: #9c8a76; font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+.plan-row h3 { margin: 7px 0; font: 600 20px 'Fraunces', serif; }
+.plan-row p { display: flex; align-items: center; gap: 5px; margin: 0; color: #92988d; font: 10px 'DM Mono', monospace; }
+.plan-row button, .plans-empty button { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; border: 1px solid #d5e1d1; border-radius: 5px; padding: 8px 10px; background: var(--soft-sage); color: #607b5b; font-size: 11px; }
+.plans-empty { display: grid; justify-items: center; gap: 9px; padding: 56px 20px; border: 1px dashed #d7ded2; border-radius: 9px; color: #8b9887; text-align: center; }
+.plans-empty strong { color: var(--ink); font: 600 20px 'Fraunces', serif; }
+.plans-empty span { font: 11px 'DM Mono', monospace; }
+@media (max-width: 560px) { .plans-dashboard { padding: 30px 14px; }.plan-row { align-items: flex-start; flex-direction: column; }.plan-row button { width: 100%; justify-content: center; }.calendar-day { min-height: 31px; } }
